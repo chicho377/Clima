@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clima</title>
+    <link rel="stylesheet" href="/Styles/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="/Js/clima.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">🌤️ Clima Hoy</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar ciudad..." id="city-input">
+            <select id="country-select">
+                <option value="CR">Costa Rica</option>
+                <option value="US">Estados Unidos</option>
+                <option value="ES">España</option>
+                <option value="MX">México</option>
+                <!-- Puedes añadir más países aquí -->
+            </select>
+            <button id="search-button">Buscar</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="current-weather">
+            <h1 id="city-name">Ciudad</h1>
+            <p id="weather-description">Descripción del clima</p>
+            <div class="weather-details">
+                <div class="temperature" id="temperature">25°C</div>
+                <div class="icon" id="weather-icon">
+                    <!-- Aquí se actualizará dinámicamente el ícono -->
+                </div>
+            </div>
+        </section>
+    
+        <section class="forecast">
+            <h2>Pronóstico</h2>
+            <div class="forecast-cards" id="forecast-cards">
+                <!-- Aquí se llenarán las tarjetas del pronóstico con JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Desarrollado por Fabricio</p>
+        <p>Datos proporcionados por <a href="https://openweathermap.org/" target="_blank">OpenWeatherMap</a></p>
+    </footer>
+</body>
+</html>
