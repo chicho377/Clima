@@ -3,6 +3,7 @@ const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
 const forecastApiUrl = 'https://api.openweathermap.org/data/2.5/forecast';
 
 const searchButton = document.getElementById('search-button');
+const currentLocationButton = document.getElementById('current-location-button');  
 const cityInput = document.getElementById('city-input');
 const countrySelect = document.getElementById('country-select');
 const weatherIcon = document.getElementById('weather-icon');
@@ -35,7 +36,27 @@ async function getWeather(city, country) {
         }
 
         updateWeatherUI(weatherData);
-        getForecast(city, country);
+        getForecast(city, country); // Obtener el pronóstico
+    } catch (error) {
+        console.error('Error al obtener el clima:', error);
+        showMessage('error', 'Error al obtener los datos. Intente de nuevo.');
+    }
+}
+
+// Función para obtener el clima de la ubicación actual del usuario
+async function getWeatherByLocation(latitude, longitude) {
+    showMessage(); // Ocultar mensajes previos
+    try {
+        const weatherResponse = await fetch(`${apiUrl}?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=es`);
+        const weatherData = await weatherResponse.json();
+
+        if (weatherData.cod !== 200) {
+            showMessage('error', 'No se pudo obtener el clima para la ubicación actual.');
+            return;
+        }
+
+        updateWeatherUI(weatherData);
+        getForecast(weatherData.name, weatherData.sys.country); // Obtener el pronóstico
     } catch (error) {
         console.error('Error al obtener el clima:', error);
         showMessage('error', 'Error al obtener los datos. Intente de nuevo.');
@@ -53,25 +74,18 @@ async function getForecast(city, country) {
             return;
         }
 
-        const dailyForecasts = groupForecastByDay(forecastData.list);
-        updateForecastUI(dailyForecasts);
+        // Filtrar los pronósticos solo para el día actual (los que están en el mismo día)
+        const today = new Date().toLocaleDateString('es-ES'); // Obtener la fecha actual en formato de día/mes/año
+        const todayForecasts = forecastData.list.filter(item => {
+            const forecastDate = new Date(item.dt * 1000).toLocaleDateString('es-ES');
+            return forecastDate === today; // Filtrar por fecha
+        });
+
+        updateForecastUI(todayForecasts); // Pasar los pronósticos de hoy a la UI
     } catch (error) {
         console.error('Error al obtener el pronóstico:', error);
         showMessage('error', 'Error al obtener el pronóstico. Intente de nuevo.');
     }
-}
-
-// Agrupar pronóstico por día
-function groupForecastByDay(forecastList) {
-    const grouped = {};
-    forecastList.forEach(item => {
-        const date = new Date(item.dt * 1000).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' });
-        if (!grouped[date]) {
-            grouped[date] = [];
-        }
-        grouped[date].push(item);
-    });
-    return Object.entries(grouped).slice(0, 5);
 }
 
 // Actualizar UI del clima actual
@@ -82,19 +96,34 @@ function updateWeatherUI(data) {
     weatherIcon.innerHTML = `<img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="Icono del clima">`;
 }
 
-// Actualizar UI del pronóstico
+// Actualizar UI del pronóstico (varios pronósticos del día actual)
 function updateForecastUI(forecasts) {
-    forecastContainer.innerHTML = '';
-    forecasts.forEach(([day, forecast]) => {
-        const dayCard = document.createElement('div');
-        dayCard.classList.add('forecast-card');
-        dayCard.innerHTML = `
-            <h4>${day}</h4>
-            <img src="http://openweathermap.org/img/wn/${forecast[0].weather[0].icon}@2x.png" alt="Icono">
-            <p>${Math.round(forecast[0].main.temp)}°C</p>
+    forecastContainer.innerHTML = ''; // Limpiar pronóstico anterior
+
+    forecasts.forEach(forecast => {
+        const forecastCard = document.createElement('div');
+        forecastCard.classList.add('forecast-card');
+        forecastCard.innerHTML = `
+            <h4>${new Date(forecast.dt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</h4>
+            <img src="http://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png" alt="Icono">
+            <p>${Math.round(forecast.main.temp)}°C</p>
         `;
-        forecastContainer.appendChild(dayCard);
+        forecastContainer.appendChild(forecastCard);
     });
+}
+
+// Obtener la ubicación actual
+function getCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            const { latitude, longitude } = position.coords;
+            getWeatherByLocation(latitude, longitude); // Obtener clima usando las coordenadas
+        }, () => {
+            showMessage('error', 'No se pudo obtener la ubicación actual.');
+        });
+    } else {
+        showMessage('error', 'La geolocalización no es compatible con este navegador.');
+    }
 }
 
 // Manejo de eventos
@@ -102,11 +131,14 @@ searchButton.addEventListener('click', () => {
     const city = cityInput.value.trim();
     const country = countrySelect.value;
     if (city) {
-        getWeather(city, country);
+        getWeather(city, country); // Buscar clima y pronóstico
     } else {
         showMessage('error', 'Por favor ingrese una ciudad.');
     }
 });
+
+// Evento del botón de ubicación actual
+currentLocationButton.addEventListener('click', getCurrentLocation); // Obtener clima de la ubicación actual
 
 // Carga inicial
 getWeather('Alajuela', 'CR');

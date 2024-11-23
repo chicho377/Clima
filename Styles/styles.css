@@ -94,6 +94,11 @@ header {
     font-size: 60px;
 }
 
+.day-night-icon {
+    font-size: 48px;
+    margin-left: 20px;
+}
+
 .forecast {
     margin-top: 30px;
 }
@@ -222,4 +227,20 @@ footer a:hover {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Estilo para el botón "Usar ubicación actual" */
+#current-location-button {
+    background-color: #4caf50;  /* Verde */
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#current-location-button:hover {
+    background-color: #45a049; /* Un tono más oscuro de verde */
 }
