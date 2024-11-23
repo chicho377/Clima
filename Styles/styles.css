@@ -183,3 +183,43 @@ footer a:hover {
     height: 60px;
     object-fit: contain; /* Asegura que la imagen mantenga su aspecto original */
 }
+
+.loading {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: #2196f3;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    position: relative; /* Esto permite posicionar el mensaje de error relativo a este contenedor */
+}
+
+.error-message {
+    position: absolute; /* Relativo al contenedor de búsqueda */
+    top: 100%; /* Justo debajo de la barra de búsqueda */
+    margin-top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ff4444;
+    font-size: 14px;
+    background-color: #ffe6e6;
+    padding: 8px 12px;
+    border-radius: 5px;
+    display: none; /* Oculto por defecto */
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
